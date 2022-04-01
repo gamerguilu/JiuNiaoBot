@@ -90,6 +90,8 @@ namespace BotServerTest
 
             string targetitemid = "";
 
+            string targetitemname = "";
+
             string targeturl_curr = "";
 
             string targeturl_history = "";
@@ -105,6 +107,7 @@ namespace BotServerTest
                     {
                         Const.ItemClass item = list[0];
                         targetitemid = item.ID;
+                        targetitemname = item.Name;
                     }
                     else if (list.Count < 1)
                     {
@@ -164,7 +167,7 @@ namespace BotServerTest
                 }
 
 
-                CreateMarketImageWithText(text_curr, text_history, Color.Black, Const.imageOutPutPath_Market, targetserver);
+                CreateMarketImageWithText(text_curr, text_history, Color.Black, Const.imageOutPutPath_Market, targetserver, targetitemname);
                 msg = " " + CombatAtMsg(userid) + "\n" + CombatImageMsg(@"MarkerBasetest.jpg");
             }
 
@@ -334,7 +337,7 @@ namespace BotServerTest
             return path;
         }
 
-        public static string CreateMarketImageWithText(string currtext,string historytext,Color FontColor,string targetfilepath,string targetServer)
+        public static string CreateMarketImageWithText(string currtext,string historytext,Color FontColor,string targetfilepath,string targetServer,string targetitem)
         {
             string path = "";
 
@@ -418,6 +421,10 @@ namespace BotServerTest
             }
 
             g.DrawString(history_sb.ToString(), f, b, 1588, 90);
+
+            g.DrawString("Server : " + targetServer, f, b, 700, 1788);
+
+            g.DrawString("Item : " + targetitem, f, b, 2120, 0);
 
             img.Save(targetfilepath, System.Drawing.Imaging.ImageFormat.Jpeg);
 

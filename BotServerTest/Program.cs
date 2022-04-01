@@ -220,9 +220,16 @@ namespace BotServerTest
                     StreamReader reader = new StreamReader(stream);
 
                     string str = reader.ReadToEnd();
-                    writer.WriteLine("");
-                    writer.Close();
-                    reader.Close();
+                    try
+                    {
+                        writer.WriteLine("");
+                        writer.Close();
+                        reader.Close();
+                    }
+                    catch
+                    {
+
+                    }
                     //talkWorker.OnGetMsg(str);
                     try
                     {
