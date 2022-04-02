@@ -188,6 +188,13 @@ namespace BotServerTest
             return false;
         }
 
+        public static string CombatFFXIVTargetNewsUrl(int TargetNewsIndex)
+        {
+            string msg = "";
+            msg = @"https://ff.web.sdo.com/inc/newdata.ashx?url=List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=" + TargetNewsIndex + @"&pageSize=1";
+            return msg;
+        }
+
         public static int GetRandomIntByLimit(int min,int max,int randomSeed)
         {
             if(min <= max)

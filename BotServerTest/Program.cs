@@ -48,9 +48,12 @@ namespace BotServerTest
             //Utlity.CreateMarketImageWithText(curr_t, hist_t, Color.Black, "D:\\tata\\BotServerTest_CSharp\\BotServerTest\\BotServerTest\\res\\texture\\MatkerBasetest.jpg");
 
             MyHttpServer server = new MyHttpServer();
-            server.OnInit();
+            Thread httpthread = new Thread(new ThreadStart(server.OnInit));
+            httpthread.Start();
 
-
+            TickChecker tickChecker = new TickChecker();
+            Thread tickthread = new Thread(new ThreadStart(tickChecker.OnInit));
+            tickthread.Start();
             //MsgSender sender = new MsgSender();
             //sender.SendMsg("asd");
 
@@ -247,6 +250,102 @@ namespace BotServerTest
         }
     }
 
+    public class TickChecker
+    {
+        private int lastTick_NewsCount = 0;
+        public void OnInit()
+        {
+            while(true)
+            {
+                try
+                {
+                    HttpWebRequest request_curr = (HttpWebRequest)WebRequest.Create(Const.FFXIVNewsUrl);
+                    HttpWebResponse response_curr = (HttpWebResponse)request_curr.GetResponse();
+
+                    string msg = "";
+
+                    using (StreamReader readStream = new StreamReader(response_curr.GetResponseStream(), Encoding.UTF8))
+                    {
+                        msg = readStream.ReadToEnd();
+                        readStream.Close();
+                    }
+                    OnCheckedNewNews(msg);
+                    Thread.Sleep(Const.FFXIVNewsTickR);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+            }
+        }
+
+        public void OnCheckedNewNews(string msg)
+        {
+            JsonData jd = JsonMapper.ToObject(msg);
+            int count = Int32.Parse(jd["TotalCount"].ToString());
+            if(lastTick_NewsCount == 0)
+            {
+                count = lastTick_NewsCount;
+            }
+            if(count != lastTick_NewsCount)
+            {
+                int targetcount = Math.Abs(count - lastTick_NewsCount);
+                OnNewsHappen(targetcount);
+                lastTick_NewsCount = count;
+            }
+        }
+
+        public void OnNewsHappen(int change_number)
+        {
+            for (int i = 0; i < change_number; i++)
+            {
+                string targeturl = Utlity.CombatFFXIVTargetNewsUrl(i);
+
+                HttpWebRequest request_curr = (HttpWebRequest)WebRequest.Create(targeturl);
+                HttpWebResponse response_curr = (HttpWebResponse)request_curr.GetResponse();
+
+                string msg = "";
+
+                using (StreamReader readStream = new StreamReader(response_curr.GetResponseStream(), Encoding.UTF8))
+                {
+                    msg = readStream.ReadToEnd();
+                    readStream.Close();
+                }
+                DealFFXIVNewsMsg(msg);
+            }
+        }
+
+        public void DealFFXIVNewsMsg(string msg)
+        {
+            JsonData jd = JsonMapper.ToObject(msg);
+            JsonData newinfo = jd["Data"][0];
+
+            string Title = newinfo["Title"].ToString();
+            string Summary = newinfo["Summary"].ToString();
+            string Author = newinfo["Author"].ToString();
+            string PublishDate = newinfo["PublishDate"].ToString();
+            string imageurl = newinfo["HomeImagePath"].ToString();
+
+            Image image = Image.FromStream(WebRequest.Create(imageurl).GetResponse().GetResponseStream());
+            image.Save(Const.imageOutPutPath_FFXIVNews);
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(@"来自 最终幻想14国服新闻中心 ：  日期 ：" + PublishDate);
+            sb.AppendLine(Title);
+            sb.AppendLine(Summary);
+            sb.AppendLine(Utlity.CombatImageMsg("News.jpg"));
+            sb.AppendLine(Author);
+
+            for (int i = 0; i < Const.newsRegisterGroup.Length; i++)
+            {
+                string targetgroup = Const.newsRegisterGroup[i];
+                TalkWorker.SendGroupMsg(targetgroup, sb.ToString());
+            }
+            
+        }
+    }
+
     public class TalkWorker
     {
 
@@ -320,13 +419,13 @@ namespace BotServerTest
             }
         }
 
-        public void SendGroupMsg(string groupid,string message)
+        public static void SendGroupMsg(string groupid,string message)
         {
             string msg = Const.posturl + "send_group_msg?" + "group_id=" + groupid + "&message=" + message;
             SendMsg(msg);
         }
 
-        public void SendMsg(string msg)
+        public static void SendMsg(string msg)
         {
             //IPAddress ip = IPAddress.Parse(Const.host);
             //IPEndPoint ipe = new IPEndPoint(ip, Const.portend);

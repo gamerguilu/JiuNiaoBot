@@ -30,6 +30,9 @@ namespace BotServerTest
 
         public static JsonData QianCaoSi_Json;
 
+        public static string FFXIVNewsUrl = @"https://ff.web.sdo.com/inc/newdata.ashx?url=List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=0&pageSize=1";
+        public static int FFXIVNewsTickR = 5000;
+
         public static string JsonInPutPath_QianCaoSi = AppDomain.CurrentDomain.BaseDirectory + @"res\json\浅草寺.json";
         public static string JsonInPutPath_AllItem = AppDomain.CurrentDomain.BaseDirectory + @"res\json\AllItem.json";
 
@@ -39,6 +42,9 @@ namespace BotServerTest
         public static string imageInPutPath_ZhanBu = AppDomain.CurrentDomain.BaseDirectory + @"res\texture\ZhanBuBase.jpg";
         public static string imageOutPutPath_ZhanBu = AppDomain.CurrentDomain.BaseDirectory + @"data\images\ZhanBu.jpg";
 
+        public static string imageOutPutPath_FFXIVNews = AppDomain.CurrentDomain.BaseDirectory + @"data\images\News.jpg";
+
+        public static string[] newsRegisterGroup = new string[] { "822612889" };
 
 
         public class ItemClass
