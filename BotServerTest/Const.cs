@@ -44,7 +44,7 @@ namespace BotServerTest
 
         public static string imageOutPutPath_FFXIVNews = AppDomain.CurrentDomain.BaseDirectory + @"data\images\News.jpg";
 
-        public static string[] newsRegisterGroup = new string[] { "822612889" };
+        public static string[] newsRegisterGroup = new string[] { "675683939", "822612889" };
 
 
         public class ItemClass
