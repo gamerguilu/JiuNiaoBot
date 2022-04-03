@@ -285,7 +285,7 @@ namespace BotServerTest
             int count = Int32.Parse(jd["TotalCount"].ToString());
             if(lastTick_NewsCount == 0)
             {
-                count = lastTick_NewsCount;
+                lastTick_NewsCount = count;
             }
             if(count != lastTick_NewsCount)
             {
