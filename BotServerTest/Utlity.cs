@@ -188,10 +188,10 @@ namespace BotServerTest
             return false;
         }
 
-        public static string CombatFFXIVTargetNewsUrl(int TargetNewsIndex)
+        public static string CombatFFXIVTargetNewsUrl(int TargetNewsIndex,int PageSize)
         {
             string msg = "";
-            msg = @"https://ff.web.sdo.com/inc/newdata.ashx?url=List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=" + TargetNewsIndex + @"&pageSize=1";
+            msg = @"https://ff.web.sdo.com/inc/newdata.ashx?url=List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=" + TargetNewsIndex + @"&pageSize=" + PageSize;
             return msg;
         }
 

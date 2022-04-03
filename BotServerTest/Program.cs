@@ -144,7 +144,7 @@ namespace BotServerTest
     //            Socket client = socket.Accept();
     //            Console.WriteLine("get client");
 
-                
+
 
     //            byte[] recv = new byte[1024];
     //            int length = client.Receive(recv);
@@ -229,18 +229,18 @@ namespace BotServerTest
                         writer.Close();
                         reader.Close();
                     }
-                    catch
+                    catch (Exception e)
                     {
-
+                        Console.WriteLine(e.ToString());
                     }
                     //talkWorker.OnGetMsg(str);
                     try
                     {
                         talkWorker.OnGetMsg(str);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        Console.WriteLine("Error");
+                        Console.WriteLine(e.ToString());
                     }
 
 
@@ -253,9 +253,10 @@ namespace BotServerTest
     public class TickChecker
     {
         private int lastTick_NewsCount = 0;
+        private List<int> lastCheckNewsID = new List<int>();
         public void OnInit()
         {
-            while(true)
+            while (true)
             {
                 try
                 {
@@ -272,7 +273,7 @@ namespace BotServerTest
                     OnCheckedNewNews(msg);
                     Thread.Sleep(Const.FFXIVNewsTickR);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
                 }
@@ -283,29 +284,91 @@ namespace BotServerTest
         {
             JsonData jd = JsonMapper.ToObject(msg);
             int count = Int32.Parse(jd["TotalCount"].ToString());
-            if(lastTick_NewsCount == 0)
+            if (lastTick_NewsCount == 0)
             {
-                count = lastTick_NewsCount;
-            }
-            if(count != lastTick_NewsCount)
-            {
-                int targetcount = Math.Abs(count - lastTick_NewsCount);
-                OnNewsHappen(targetcount);
                 lastTick_NewsCount = count;
+                OnNewsHappen(true);
+            }
+            else
+            {
+                OnNewsHappen(false);
+            }
+            //if (count != lastTick_NewsCount)
+            //{
+            //    int targetcount = Math.Abs(count - lastTick_NewsCount);
+            //    if (OnNewsHappen(targetcount))
+            //    {
+            //        lastTick_NewsCount = count;
+            //    }
+            //}
+        }
+        public void OnNewsHappen(bool toread = false)
+        {
+
+            string targeturl = Utlity.CombatFFXIVTargetNewsUrl(1, 20);
+
+            HttpWebRequest request_curr = (HttpWebRequest)WebRequest.Create(targeturl);
+            HttpWebResponse response_curr = (HttpWebResponse)request_curr.GetResponse();
+
+            string msg = "";
+            using (StreamReader readStream = new StreamReader(response_curr.GetResponseStream(), Encoding.UTF8))
+            {
+                msg = readStream.ReadToEnd();
+                readStream.Close();
+            }
+
+            News_ClassType news = JsonMapper.ToObject<News_ClassType>(msg);
+            if (news.Data != null)
+            {
+                List<int> checkid = new List<int>();
+                for (int i = 0; i < news.Data.Count; i++)
+                {
+                    News_ClassTypeItem item = news.Data[i];
+                    checkid.Add(item.Id);
+
+                    if (!toread)
+                    {
+                        if (!lastCheckNewsID.Contains(item.Id))
+                        {
+
+                            Image image = Image.FromStream(WebRequest.Create(item.HomeImagePath).GetResponse().GetResponseStream());
+                            image.Save(Const.imageOutPutPath_FFXIVNews);
+
+                            StringBuilder sb = new StringBuilder();
+
+                            sb.AppendLine(@"来自 最终幻想14国服新闻中心     日期 ：" + item.PublishDate);
+                            sb.AppendLine(item.Title);
+                            sb.AppendLine(item.Summary);
+                            sb.AppendLine(Utlity.CombatImageMsg("News.jpg"));
+                            sb.AppendLine(item.Author);
+
+                            for (int j = 0; j < Const.newsRegisterGroup.Length; j++)
+                            {
+                                string targetgroup = Const.newsRegisterGroup[j];
+                                TalkWorker.SendGroupMsg(targetgroup, sb.ToString());
+                                Console.WriteLine(sb.ToString());
+                            }
+                        }
+                    }                    
+                }
+                lastCheckNewsID = checkid;
             }
         }
 
+
+
         public void OnNewsHappen(int change_number)
         {
+
             for (int i = 0; i < change_number; i++)
             {
-                string targeturl = Utlity.CombatFFXIVTargetNewsUrl(i);
+                string targeturl = Utlity.CombatFFXIVTargetNewsUrl(i,1);
 
                 HttpWebRequest request_curr = (HttpWebRequest)WebRequest.Create(targeturl);
                 HttpWebResponse response_curr = (HttpWebResponse)request_curr.GetResponse();
 
                 string msg = "";
-
+                Console.WriteLine("change_number : " + change_number);
                 using (StreamReader readStream = new StreamReader(response_curr.GetResponseStream(), Encoding.UTF8))
                 {
                     msg = readStream.ReadToEnd();
@@ -317,6 +380,8 @@ namespace BotServerTest
 
         public void DealFFXIVNewsMsg(string msg)
         {
+
+
             JsonData jd = JsonMapper.ToObject(msg);
             JsonData newinfo = jd["Data"][0];
 
@@ -331,7 +396,7 @@ namespace BotServerTest
 
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(@"来自 最终幻想14国服新闻中心 ：  日期 ：" + PublishDate);
+            sb.AppendLine(@"来自 最终幻想14国服新闻中心     日期 ：" + PublishDate);
             sb.AppendLine(Title);
             sb.AppendLine(Summary);
             sb.AppendLine(Utlity.CombatImageMsg("News.jpg"));
@@ -340,9 +405,10 @@ namespace BotServerTest
             for (int i = 0; i < Const.newsRegisterGroup.Length; i++)
             {
                 string targetgroup = Const.newsRegisterGroup[i];
-                TalkWorker.SendGroupMsg(targetgroup, sb.ToString());
+                //TalkWorker.SendGroupMsg(targetgroup, sb.ToString());
+                Console.WriteLine(sb.ToString());
             }
-            
+
         }
     }
 
@@ -356,7 +422,7 @@ namespace BotServerTest
 
             string post_type = jsondata["post_type"].ToString();
 
-            switch(post_type)
+            switch (post_type)
             {
                 case Const.posttype_message:
                     {
@@ -375,7 +441,7 @@ namespace BotServerTest
                             case Const.messagetype_private:
                                 {
                                     //Console.WriteLine("Private : " + message);
-                                    OnGetPrivateMsg(message,user_id);
+                                    OnGetPrivateMsg(message, user_id);
                                 }
                                 break;
                         }
@@ -391,14 +457,14 @@ namespace BotServerTest
         }
 
 
-        private void OnGetPrivateMsg(string msg,string userid)
+        private void OnGetPrivateMsg(string msg, string userid)
         {
             SendGroupMsg("822612889", msg);
         }
 
-        public void OnGetGroupMsg(string msg, string userid,string groupid)
+        public void OnGetGroupMsg(string msg, string userid, string groupid)
         {
-            if(msg.Contains("/占卜"))
+            if (msg.Contains("/占卜"))
             {
 
 
@@ -419,7 +485,7 @@ namespace BotServerTest
             }
         }
 
-        public static void SendGroupMsg(string groupid,string message)
+        public static void SendGroupMsg(string groupid, string message)
         {
             string msg = Const.posturl + "send_group_msg?" + "group_id=" + groupid + "&message=" + message;
             SendMsg(msg);

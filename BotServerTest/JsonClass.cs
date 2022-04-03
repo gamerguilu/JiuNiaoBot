@@ -55,4 +55,21 @@ namespace BotServerTest
         public long lastUploadTime { get; set; }
         public List<Market_HistoryTypeItem> entries { get; set; }
     }
+
+
+    public class News_ClassType
+    {
+        public List<News_ClassTypeItem> Data { get; set; }
+
+    }
+
+    public class News_ClassTypeItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Summary { get; set; }
+        public string Author { get; set; }
+        public string PublishDate { get; set; }
+        public string HomeImagePath { get; set; }
+    }
 }
