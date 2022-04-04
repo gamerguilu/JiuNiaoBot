@@ -117,7 +117,16 @@ namespace BotServerTest
                     {
                         if(targetitemid == "")
                         {
-                            msg = Utlity.CombatAtMsg(userid) + " \n" + " 找到了名称包含 " + strlist[i] + "  的物品 " + list.Count + "  个";
+                            for (int j = 0; j < list.Count; j++)
+                            {
+                                if(list[j].Name == target)
+                                {
+                                    Const.ItemClass item = list[0];
+                                    targetitemid = item.ID;
+                                    targetitemname = item.Name;
+                                }
+                            }
+                            msg = " 找到了名称包含 " + strlist[i] + "  的物品 " + list.Count + "  个";
                         }
                     }
 
@@ -168,7 +177,7 @@ namespace BotServerTest
 
 
                 CreateMarketImageWithText(text_curr, text_history, Color.Black, Const.imageOutPutPath_Market, targetserver, targetitemname);
-                msg = " " + CombatAtMsg(userid) + "\n" + CombatImageMsg(@"MarkerBasetest.jpg");
+                msg = msg +  "\n " + CombatAtMsg(userid) + "\n" + CombatImageMsg(@"MarkerBasetest.jpg");
             }
 
 
