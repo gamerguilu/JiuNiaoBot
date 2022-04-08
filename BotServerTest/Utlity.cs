@@ -99,7 +99,12 @@ namespace BotServerTest
             for (int i = 0; i < strlist.Length; i++)
             {
                 string target = strlist[i];
-                targetserver = (CheckServer(target) != "" ? CheckServer(target): targetserver);
+                string local_targetserver = (CheckServer(target) != "" ? CheckServer(target): targetserver);
+                if(local_targetserver != "" && targetserver == "")
+                {
+                    targetserver = local_targetserver;
+                    continue;
+                }
                 if (rex.IsMatch(target) && !target.Contains("/market"))
                 {
                     List<Const.ItemClass> list = Utlity.GetItemsByName(target);
@@ -108,6 +113,7 @@ namespace BotServerTest
                         Const.ItemClass item = list[0];
                         targetitemid = item.ID;
                         targetitemname = item.Name;
+                        msg = Utlity.CombatAtMsg(userid);
                     }
                     else if (list.Count < 1)
                     {
@@ -115,10 +121,30 @@ namespace BotServerTest
                     }
                     else
                     {
-                        if(targetitemid == "")
+                        string local_targetitemid = "";
+                        string local_itemname = "";
+
+                        for (int j = 0; j < list.Count; j++)
                         {
-                            msg = Utlity.CombatAtMsg(userid) + " \n" + " 找到了名称包含 " + strlist[i] + "  的物品 " + list.Count + "  个";
+                            if (list[j].Name == target)
+                            {
+                                Const.ItemClass item = list[j];
+                                local_targetitemid = item.ID;
+                                local_itemname = item.Name;
+                            }
                         }
+
+                        if (local_targetitemid == "" && local_itemname == "")
+                        {
+                            msg = Utlity.CombatAtMsg(userid) + "\n" + " 找到了名称包含 " + strlist[i] + "  的物品 " + list.Count + "  个";
+                        }
+                        else
+                        {
+                            msg = Utlity.CombatAtMsg(userid) + "\n"  + " 找到了名称包含 " + strlist[i] + "  的物品 " + list.Count + "  个,这里显示名称相等的哪一个";
+                            targetitemid = local_targetitemid;
+                            targetitemname = local_itemname;
+                        }
+
                     }
 
                 }
@@ -168,7 +194,7 @@ namespace BotServerTest
 
 
                 CreateMarketImageWithText(text_curr, text_history, Color.Black, Const.imageOutPutPath_Market, targetserver, targetitemname);
-                msg = " " + CombatAtMsg(userid) + "\n" + CombatImageMsg(@"MarkerBasetest.jpg");
+                msg = msg +   "\n" + CombatImageMsg(@"MarkerBasetest.jpg");
             }
 
 
@@ -188,10 +214,10 @@ namespace BotServerTest
             return false;
         }
 
-        public static string CombatFFXIVTargetNewsUrl(int TargetNewsIndex)
+        public static string CombatFFXIVTargetNewsUrl(int TargetNewsIndex,int PageSize)
         {
             string msg = "";
-            msg = @"https://ff.web.sdo.com/inc/newdata.ashx?url=List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=" + TargetNewsIndex + @"&pageSize=1";
+            msg = @"https://ff.web.sdo.com/inc/newdata.ashx?url=List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=" + TargetNewsIndex + @"&pageSize=" + PageSize;
             return msg;
         }
 
@@ -507,7 +533,7 @@ namespace BotServerTest
 
             string unluck = unluckevent.Split('|')[0];
 
-            string msg = " " + Utlity.CombatAtMsg(userid) + "\n 运势：" + luck_number + "% 幸运职业：  " + luck_job + " \n 宜：" + goodat + "  忌: " + unluck + " 幸运染剂：" + luck_dye + " \n " + asay;
+            string msg = " " + Utlity.CombatAtMsg(userid) + "\n 运势：" + luck_number + "%   幸运职业： " + luck_job + " \n 宜：" + goodat + "   忌:  " + unluck + " 幸运染剂：" + luck_dye + " \n " + asay;
 
             return msg;
         }
