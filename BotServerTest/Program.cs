@@ -341,7 +341,7 @@ namespace BotServerTest
                             sb.AppendLine(item.Summary);
                             sb.AppendLine(Utlity.CombatImageMsg("News.jpg"));
                             sb.AppendLine(item.Author);
-
+                            Console.WriteLine("news author : " + item.Author);
                             for (int j = 0; j < Const.newsRegisterGroup.Length; j++)
                             {
                                 string targetgroup = Const.newsRegisterGroup[j];
