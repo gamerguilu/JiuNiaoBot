@@ -11,15 +11,46 @@ using System.Drawing;
 using System.Net.Sockets;
 using LitJson;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace BotServerTest
 {
     class Program
     {
+        private static Process TataProcess;
+
+        public static Process GetProcess()
+        {
+            return TataProcess;
+        }
+
+        //public delegate bool ControlCtrlDelegate(int CtrlType);
+        //[DllImport("kernel32.dll")]
+        //private static extern bool SetConsoleCtrlHandler(ControlCtrlDelegate HandlerRoutine, bool Add);
+        //private static ControlCtrlDelegate cancelHandler = new ControlCtrlDelegate(HandlerRoutine);
+        //public static bool HandlerRoutine(int CtrlType)
+        //{
+        //    switch (CtrlType)
+        //    {
+        //        case 0:
+        //            CurrentDomain_ProcessExit();
+        //            Console.WriteLine("0工具被强制关闭"); //Ctrl+C关闭 
+        //            break;
+        //        case 2:
+        //            CurrentDomain_ProcessExit();
+        //            Console.WriteLine("2工具被强制关闭");//按控制台关闭按钮关闭 
+        //            break;
+        //    }
+        //    //Console.ReadLine();
+        //    return false;
+        //}
         static void Main(string[] args)
         {
 
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+
+            //SetConsoleCtrlHandler(cancelHandler, true);
             InitJsonLoader();
 
             //HttpWebRequest curr_request = (HttpWebRequest)WebRequest.Create("https://universalis.app/api/%E7%8C%AB%E5%B0%8F%E8%83%96/34706");
@@ -54,20 +85,61 @@ namespace BotServerTest
             TickChecker tickChecker = new TickChecker();
             Thread tickthread = new Thread(new ThreadStart(tickChecker.OnInit));
             tickthread.Start();
-            //MsgSender sender = new MsgSender();
-            //sender.SendMsg("asd");
 
-            //HttpServerTest server = new HttpServerTest();
-            //server.Init();
 
-            //sender.SendHttpMsg("send_group_msg?group_id=822612889&message=test");
+            string input = "";
+            while(true)
+            {
+                input = Console.ReadLine();
+                ReadCommand(input);
+            }
 
-            //sender.SendHttpMsg("send_private_msg?user_id=1270672343&message=test");
+        }
 
-            //MsgLinstener lis = new MsgLinstener();
-            //lis.Listen();
+        public static void ReadCommand(string command)
+        {
+            if(command.Contains("/groupmsg"))
+            {
+                string msg = "";
+                if (command.Contains("msg:"))
+                {
+                    int index = command.LastIndexOf("msg:");
+                    index = index + "msg:".Length;
+                    msg = command.Substring(index);
+                }
+                Regex regex = new Regex("[0-9]+");
+                MatchCollection co = regex.Matches(command);
+                foreach (Match item in co)
+                {
+                    string groupid = item.Value;
+                    TalkWorker.SendGroupMsg(groupid, Utlity.UncodingSharp(msg));
+                }
 
-            Console.Read();
+            }
+            else if (command.Contains("/moyu"))
+            {
+                string msg = "";
+                Image img = Image.FromStream(WebRequest.Create("https://api.vvhan.com/api/moyu").GetResponse().GetResponseStream());
+                img.Save(Const.imageOutPutPath_Moyu);
+                msg = Utlity.CombatImageMsg("Moyu.jpg");
+                Regex regex = new Regex("[0-9]+");
+                MatchCollection co = regex.Matches(command);
+                foreach (Match item in co)
+                {
+                    string groupid = item.Value;
+                    TalkWorker.SendGroupMsg(groupid, Utlity.UncodingSharp(msg));
+                }
+            }
+        }
+
+        public static void CurrentDomain_ProcessExit(object sender,EventArgs e)
+        {
+            if(TataProcess != null)
+            {
+                TataProcess.CloseMainWindow();
+                TataProcess.Close();
+            }
+            Console.WriteLine("Exit");
         }
 
         public static void InitJsonLoader()
@@ -94,7 +166,19 @@ namespace BotServerTest
         {
             ProcessStartInfo start = new ProcessStartInfo(Const.TataPath);
 
-            Process.Start(start);
+            TataProcess = Process.Start(start);
+        }
+
+        public static void ReStartTata()
+        {
+            if(TataProcess != null)
+            {
+                TataProcess.Close();
+
+                ProcessStartInfo start = new ProcessStartInfo(Const.TataPath);
+
+                TataProcess = Process.Start(start);
+            }
         }
     }
 
@@ -270,6 +354,7 @@ namespace BotServerTest
                         msg = readStream.ReadToEnd();
                         readStream.Close();
                     }
+                    response_curr.Close();
                     OnCheckedNewNews(msg);
                     Thread.Sleep(Const.FFXIVNewsTickR);
                 }
@@ -316,6 +401,7 @@ namespace BotServerTest
                 msg = readStream.ReadToEnd();
                 readStream.Close();
             }
+            response_curr.Close();
 
             News_ClassType news = JsonMapper.ToObject<News_ClassType>(msg);
             if (news.Data != null)
@@ -400,7 +486,7 @@ namespace BotServerTest
             sb.AppendLine(Title);
             sb.AppendLine(Summary);
             sb.AppendLine(Utlity.CombatImageMsg("News.jpg"));
-            sb.AppendLine(Author);
+            sb.AppendLine(Utlity.UncodingSharp(Author));
 
             for (int i = 0; i < Const.newsRegisterGroup.Length; i++)
             {
@@ -462,26 +548,63 @@ namespace BotServerTest
             SendGroupMsg("822612889", msg);
         }
 
+        public bool CheckReportMsgFormGroup(string msg ,string groupid)
+        {
+            for (int i = 0; i < Const.ReportHunterTarget.Length; i++)
+            {
+                if(msg.Contains(Const.ReportHunterTarget[i]) && msg.Contains("紫水栈桥"))
+                {
+                    msg = Utlity.UncodingMid(msg);
+                    Console.WriteLine("CheckReportMsgFormGroup :: " + msg);
+                    SendMsgToAllRegedGroup(msg);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void OnGetGroupMsg(string msg, string userid, string groupid)
         {
-            if (msg.Contains("/占卜"))
+            if (Const.ReportFormGroup.Contains(groupid))
             {
-
-
-                string luckreturn = Utlity.CombatLuckMsg(userid);
-
-                //Console.WriteLine(luckreturn);
-                SendGroupMsg(groupid, luckreturn.ToString());
+                if (CheckReportMsgFormGroup(msg, groupid))
+                {
+                    return;
+                }
             }
-            else if (msg.Contains("/luck"))
+            else
             {
-                Utlity.CombatZhanBuMsg(userid);
-                SendGroupMsg(groupid, Utlity.CombatZhanBuMsg(userid));
-            }
-            else if (msg.Contains("/market"))
-            {
-                SendGroupMsg(groupid, Utlity.CombatMatkerMsg(msg, userid));
+                if (msg.Contains("/占卜"))
+                {
 
+
+                    string luckreturn = Utlity.CombatLuckMsg(userid);
+
+                    //Console.WriteLine(luckreturn);
+                    SendGroupMsg(groupid, luckreturn.ToString());
+                }
+                else if (msg.Contains("/luck"))
+                {
+                    Utlity.CombatZhanBuMsg(userid);
+                    SendGroupMsg(groupid, Utlity.CombatZhanBuMsg(userid));
+                }
+                else if (msg.Contains("/market"))
+                {
+                    SendGroupMsg(groupid, Utlity.CombatMatkerMsg(msg, userid));
+
+                }
+                else if (msg.Contains("/Weather"))
+                {
+
+                }
+            }
+        }
+
+        public void SendMsgToAllRegedGroup(string msg)
+        {
+            for (int i = 0; i < Const.newsRegisterGroup.Length; i++)
+            {
+                SendGroupMsg(Const.newsRegisterGroup[i], msg);
             }
         }
 

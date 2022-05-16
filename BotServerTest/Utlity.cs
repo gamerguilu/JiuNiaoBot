@@ -232,9 +232,55 @@ namespace BotServerTest
             return 0;
         }
 
+        public static string UncodingSharp(string target)
+        {
+            string ret = target;
+
+            ret = ret.Replace("#", "%23");
+
+            return ret;
+        }
+
+
+
+        public static string UncodingMid(string target)
+        {
+            string ret = target;
+
+            Console.WriteLine(ret);
+
+            ret = ret.Replace("&#91;", "");
+
+            ret = ret.Replace("&#92;", "");
+
+            ret = ret.Replace("&#93;", "");
+
+            ret = ret.Replace("&#94;", "");
+
+            Console.WriteLine(ret);
+
+            return ret;
+        }
+
         public static string CombatAtMsg(string userid)
         {
             string msg = "[CQ:at,qq=" + userid + "]";
+            return msg;
+        }
+
+        public static string CombatMoyuMsg()
+        {
+            string msg = "";
+            msg = DownLoadAndCombatMsg("Moyu.jpg", Const.MoyuApi);
+            return msg;
+        }
+
+        public static string DownLoadAndCombatMsg(string cachefileName,string Imageurl)
+        {
+            string msg = "";
+            Image img = Image.FromStream(WebRequest.Create(Imageurl).GetResponse().GetResponseStream());
+            img.Save(Const.imageOutPutPath_ToolS + cachefileName);
+            msg = Utlity.CombatImageMsg(cachefileName);
             return msg;
         }
 
@@ -486,7 +532,7 @@ namespace BotServerTest
 
             int randomvalue = r.Next(5000);
 
-            int luck_number = Utlity.GetRandomIntByLimit(1, 101, randomvalue);
+            int luck_number = Utlity.GetRandomIntByLimit(1, 100, randomvalue);
 
             return luck_number;
         }

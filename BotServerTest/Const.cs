@@ -20,6 +20,8 @@ namespace BotServerTest
         public const string universalisurl = "https://universalis.app/api/";
         public const string universalisurl_history = "https://universalis.app/api/history/";
 
+        public const string MoyuApi = "https://api.vvhan.com/api/moyu";
+
         public const string posttype_message = "message";
         public const string posttype_notice = "notice";
 
@@ -43,9 +45,48 @@ namespace BotServerTest
         public static string imageOutPutPath_ZhanBu = AppDomain.CurrentDomain.BaseDirectory + @"data\images\ZhanBu.jpg";
 
         public static string imageOutPutPath_FFXIVNews = AppDomain.CurrentDomain.BaseDirectory + @"data\images\News.jpg";
+        
+        public static string imageOutPutPath_Moyu = AppDomain.CurrentDomain.BaseDirectory + @"data\images\Moyu.jpg";
 
-        public static string[] newsRegisterGroup = new string[] { "675683939", "822612889", "469676149" };
+        public static string imageOutPutPath_ToolS = AppDomain.CurrentDomain.BaseDirectory + @"data\images\";
 
+        public static string[] newsRegisterGroup = new string[] {
+            "675683939",
+            "822612889",
+            "469676149"
+        };
+        public static string[] ReportFormGroup = new string[] {
+            "682586896",
+        };
+
+        public static string[] ReportHunterTarget = new string[] {
+        "狭缝","俄菲翁尼厄斯","沉思之物","阿姆斯特朗","布弗鲁","颇胝迦","得到宽恕的炫学","戾虫","多智兽","顾尼图","阿格拉俄珀","伊休妲",
+            "伪神降临",
+            "破坏侵略兵器希",
+            "长须豹女王",
+            "激斗畏惧装甲",
+            "神——奥丁",
+            "夜光花歼",
+            "贝希摩",
+            "九尾妖狐玉藻",
+            "灾厄的古塔尼亚之深",
+            "伊克西翁",
+        };
+
+        public static string[] CheckRoportMsgInfo = new string[] {
+            "-S",
+            "伪神降临",
+            "破坏侵略兵器希",
+            "长须豹女王",
+            "激斗畏惧装甲",
+            "神——奥丁",
+            "夜光花歼",
+            "贝希摩",
+            "九尾妖狐玉藻",
+            "灾厄的古塔尼亚之深",
+            "伊克西翁",
+
+        };
 
         public class ItemClass
         {
