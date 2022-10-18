@@ -597,6 +597,14 @@ namespace BotServerTest
                 {
 
                 }
+                else if (msg.Contains("/moyu"))
+                {
+                    string message = "";
+                    Image img = Image.FromStream(WebRequest.Create("https://api.vvhan.com/api/moyu").GetResponse().GetResponseStream());
+                    img.Save(Const.imageOutPutPath_Moyu);
+                    message = Utlity.CombatImageMsg("Moyu.jpg");
+                    TalkWorker.SendGroupMsg(groupid, Utlity.UncodingSharp(message));
+                }
             }
         }
 
@@ -610,6 +618,7 @@ namespace BotServerTest
 
         public static void SendGroupMsg(string groupid, string message)
         {
+            Console.WriteLine("SendGroupMsg   groupid : " + groupid + " message : " + message);
             string msg = Const.posturl + "send_group_msg?" + "group_id=" + groupid + "&message=" + message;
             SendMsg(msg);
         }
