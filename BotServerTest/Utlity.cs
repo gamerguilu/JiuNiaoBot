@@ -1,13 +1,18 @@
-﻿using LitJson;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.IO;
+using System.Drawing;
+using System.Net.Sockets;
+using LitJson;
+using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace BotServerTest
 {
@@ -209,8 +214,27 @@ namespace BotServerTest
             {
                 StreamReader sr = new StreamReader(fs);
                 fileContent = sr.ReadToEnd();
+                fs.Close();
                 return true; 
             }
+            fs.Close();
+            return false;
+        }
+
+        public static bool SaveStringFile(string filepath,string fileContent)
+        {
+            FileStream fs = new FileStream(filepath, FileMode.Create,FileAccess.ReadWrite);
+            Console.WriteLine(fileContent.Length);
+            if (fs.CanRead)
+            {
+                StreamWriter sw = new StreamWriter(fs);
+                sw.Write(fileContent);
+                Thread.Sleep(100);
+                sw.Close();
+                fs.Close();
+                return true;
+            }
+            fs.Close();
             return false;
         }
 

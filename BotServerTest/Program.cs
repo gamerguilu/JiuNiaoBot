@@ -50,30 +50,22 @@ namespace BotServerTest
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
 
-            //SetConsoleCtrlHandler(cancelHandler, true);
+            ConfigLoader cl = new ConfigLoader();
+            cl.Initilize();
+
+            Thread.Sleep(10);
+
             InitJsonLoader();
 
-            //HttpWebRequest curr_request = (HttpWebRequest)WebRequest.Create("https://universalis.app/api/%E7%8C%AB%E5%B0%8F%E8%83%96/34706");
-            //HttpWebResponse curr_response = (HttpWebResponse)curr_request.GetResponse();
 
-            //string curr_t = "";
+            StartRun();
 
-            //using (StreamReader readStream = new StreamReader(curr_response.GetResponseStream(), Encoding.UTF8))
-            //{
-            //    curr_t = readStream.ReadToEnd();
-            //}
+            Console.Read();
 
+        }
 
-            //HttpWebRequest hist_request = (HttpWebRequest)WebRequest.Create("https://universalis.app/api/history/%E7%8C%AB%E5%B0%8F%E8%83%96/34706");
-            //HttpWebResponse hist_response = (HttpWebResponse)hist_request.GetResponse();
-
-            //string hist_t = "";
-
-            //using (StreamReader readStream = new StreamReader(hist_response.GetResponseStream(), Encoding.UTF8))
-            //{
-            //    hist_t = readStream.ReadToEnd();
-            //}
-
+        public static void StartRun()
+        {
             RunTataProcess();
 
             //Utlity.CreateMarketImageWithText(curr_t, hist_t, Color.Black, "D:\\tata\\BotServerTest_CSharp\\BotServerTest\\BotServerTest\\res\\texture\\MatkerBasetest.jpg");
@@ -88,12 +80,11 @@ namespace BotServerTest
 
 
             string input = "";
-            while(true)
+            while (true)
             {
                 input = Console.ReadLine();
                 ReadCommand(input);
             }
-
         }
 
         public static void ReadCommand(string command)

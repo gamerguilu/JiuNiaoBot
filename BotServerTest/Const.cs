@@ -10,6 +10,11 @@ namespace BotServerTest
 
     public static class Const
     {
+
+
+        public static readonly string DataMiningPath = @"F:\FFXIVBOT\ItemConfig\ffxiv-datamining-cn";
+
+
         public const int listenport = 8000;
         public const int endport = 5700;
         public const string host = "127.0.0.1";

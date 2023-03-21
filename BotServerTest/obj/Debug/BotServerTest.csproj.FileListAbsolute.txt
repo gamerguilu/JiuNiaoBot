@@ -25,3 +25,12 @@ D:\tata\BotServerTest_CSharp_Develop\BotServerTest\JiuNiaoBot\BotServerTest\bin\
 D:\tata\BotServerTest_CSharp_Develop\BotServerTest\JiuNiaoBot\BotServerTest\bin\Debug\BotServerTest.pdb
 D:\tata\BotServerTest_CSharp_Develop\BotServerTest\JiuNiaoBot\BotServerTest\bin\Debug\LitJson.dll
 D:\tata\BotServerTest_CSharp_Develop\BotServerTest\JiuNiaoBot\BotServerTest\obj\Debug\BotServerTest.csproj.CopyComplete
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\bin\Debug\LitJson.dll
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\obj\Debug\BotServerTest.csprojAssemblyReference.cache
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\obj\Debug\BotServerTest.csproj.CoreCompileInputs.cache
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\obj\Debug\BotServerTest.exe
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\obj\Debug\BotServerTest.pdb
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\bin\Debug\BotServerTest.exe.config
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\bin\Debug\BotServerTest.exe
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\bin\Debug\BotServerTest.pdb
+F:\FFXIVBOT\JiuNiaoBot\BotServerTest\obj\Debug\BotServerTest.csproj.CopyComplete
